@@ -1,21 +1,14 @@
 package be.appify.railev3;
 
-import be.appify.lego.ev3.component.ColorSensor;
-import be.appify.lego.ev3.component.Components;
-import be.appify.lego.ev3.component.LightColor;
-import be.appify.lego.ev3.component.SensorColor;
+import be.appify.lego.ev3.component.*;
 import be.appify.lego.ev3.ui.Menu;
 import be.appify.util.Function;
 import be.appify.util.Lists;
 import lejos.hardware.Sound;
-import lejos.hardware.motor.Motor;
-import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
-import lejos.internal.ev3.EV3MotorPort;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RailEv3 {
@@ -97,8 +90,6 @@ public class RailEv3 {
         colorSensor.off();
     }
 
-    private boolean forward = true;
-
     private void discoveryMenu() {
         // /\
         // |O  BLUE
@@ -108,8 +99,8 @@ public class RailEv3 {
         // |O  RED
         // \/
         Components.display().clear();
-        final NXTRegulatedMotor motor = new NXTRegulatedMotor(MotorPort.A);
-        motor.setSpeed(360);
+        final Motor motor = Components.motor(MotorPort.A);
+        motor.speed(360);
 
         Menu.<String>create()
                 .header("Discover topology:")
@@ -140,29 +131,20 @@ public class RailEv3 {
                 .showAt(0, 0);
     }
 
-    private void endDiscovery(NXTRegulatedMotor motor) {
+    private void endDiscovery(Motor motor) {
         stopEngine(motor);
-        motor.close();
     }
 
-    private void reverseEngine(NXTRegulatedMotor motor) {
-        forward = !forward;
-        if (motor.isMoving()) {
-            stopEngine(motor);
-            startEngine(motor);
-        }
+    private void reverseEngine(Motor motor) {
+        motor.reverse();
     }
 
-    private void stopEngine(NXTRegulatedMotor motor) {
+    private void stopEngine(Motor motor) {
         motor.stop();
     }
 
-    private void startEngine(NXTRegulatedMotor motor) {
-        if (forward) {
-            motor.forward();
-        } else {
-            motor.backward();
-        }
+    private void startEngine(Motor motor) {
+        motor.start();
 
     }
 

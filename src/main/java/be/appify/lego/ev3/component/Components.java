@@ -8,7 +8,7 @@ import java.util.Map;
 public class Components {
     private static Display display = new Display();
     private static Light light = new Light();
-    private static Map<Port, Object> sensors = new HashMap<>();
+    private static Map<Port, Object> hardware = new HashMap<>();
 
     public static Display display() {
         return display;
@@ -23,11 +23,20 @@ public class Components {
     }
 
     public static ColorSensor colorSensor(Port port) {
-        ColorSensor sensor = (ColorSensor) sensors.get(port);
+        ColorSensor sensor = (ColorSensor) hardware.get(port);
         if(sensor == null) {
             sensor = new ColorSensor(port);
-            sensors.put(port, sensor);
+            hardware.put(port, sensor);
         }
         return sensor;
+    }
+
+    public static Motor motor(Port port) {
+        Motor motor = (Motor) hardware.get(port);
+        if(motor == null) {
+            motor = new Motor(port);
+            hardware.put(port, motor);
+        }
+        return motor;
     }
 }
