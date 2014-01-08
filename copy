@@ -1,2 +1,2 @@
-sshpass -p "" scp railev3-1.0-SNAPSHOT.jar root@10.0.1.1:/home/lejos/programs/
+sshpass -p "" scp target/railev3-1.0-SNAPSHOT.jar root@10.0.1.1:/home/lejos/programs/
 echo Done!

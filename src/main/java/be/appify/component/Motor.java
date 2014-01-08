@@ -32,7 +32,7 @@ public class Motor {
     public Motor stop() {
         initializeIfNecessary();
         motor.stop();
-        motor.close();
+        motor.suspendRegulation();
         return this;
     }
 

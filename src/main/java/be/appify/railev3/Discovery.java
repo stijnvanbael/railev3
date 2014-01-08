@@ -20,19 +20,19 @@ public class Discovery {
     void initializeDiscovery() {
         Components.display().clear();
         ColorSensor colorSensor = Components.colorSensor(SensorPort.S3);
+        Components.display().text("Initializing").showAt(0, 3);
+        Components.display().text("Please wait...").showAt(2, 4);
         colorSensor.colorMode();
-        if (!colorSensor.isInitialized()) {
-            Components.display().text("Initializing").showAt(0, 3);
-            Components.display().text("Please wait...").showAt(2, 4);
-            colorSensor.awaitInitialization();
-        }
+        colorSensor.awaitActivation();
         colorSensor.onColorChanged(new Function<SensorColor, Void>() {
             @Override
             public Void apply(SensorColor color) {
                 if (color != SensorColor.BLACK && color != SensorColor.UNKNOWN && color != SensorColor.WHITE) {
                     String colorName = color.name();
+                    Components.display().clearLine(7);
+                    Components.display().text("Detected: " + colorName).showAt(0, 7);
                     Sound.twoBeeps();
-                    Components.light().color(LightColor.ORANGE).blink();
+                    Components.light().color(LightColor.ORANGE).flash();
                     if (!allDestinations.contains(colorName)) {
                         allDestinations.add(colorName);
                     }

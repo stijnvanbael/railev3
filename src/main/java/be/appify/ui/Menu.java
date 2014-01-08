@@ -54,25 +54,25 @@ public class Menu<T> {
         return null;
     }
 
-    private T renderMenu(final int x, final int y) {
+    private T renderMenu(final int x, int y) {
         if (refreshAction != null)
             refreshAction.run();
-        renderHeader(x, y);
+        final int newY = renderHeader(x, y);
         selectFirst();
         final Set<T> returnValue = new HashSet<>();
-        renderOptions(x, y);
+        renderOptions(x, newY);
         while (!exit) {
             Components.keypad()
                     .onKeyDo(Key.UP, new Runnable() {
                         @Override
                         public void run() {
-                            selectPrevious(x, y);
+                            selectPrevious(x, newY);
                         }
                     })
                     .onKeyDo(Key.DOWN, new Runnable() {
                         @Override
                         public void run() {
-                            selectNext(x, y);
+                            selectNext(x, newY);
                         }
                     })
                     .onKeyDo(Key.ENTER, new Runnable() {
@@ -124,14 +124,14 @@ public class Menu<T> {
     }
 
     private T abort() {
-        Components.light().color(LightColor.RED).blink();
+        Components.light().color(LightColor.RED).flash();
         Components.display().clear();
         exit = true;
         return null;
     }
 
     private T executeActionAndReturnValue() {
-        Components.light().color(LightColor.GREEN).blink();
+        Components.light().color(LightColor.GREEN).flash();
         Components.display().clear();
         selected.execute();
         return selected.getValue();

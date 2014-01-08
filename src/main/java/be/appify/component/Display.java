@@ -8,4 +8,6 @@ public interface Display {
     Text text(String text);
 
     void clear();
+
+    void clearLine(int y);
 }

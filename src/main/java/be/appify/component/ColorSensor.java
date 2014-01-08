@@ -12,8 +12,7 @@ public class ColorSensor {
     private EV3ColorSensor sensor;
     private Mode mode;
     private Port port;
-    private Runnable onInitializeAction;
-    private CountDownLatch initialized;
+    private CountDownLatch active = new CountDownLatch(1);
 
     ColorSensor(Port port) {
         this.port = port;
@@ -24,19 +23,14 @@ public class ColorSensor {
         return this;
     }
 
-    public ColorSensor onInitialize(Runnable onInitializeAction) {
-        this.onInitializeAction = onInitializeAction;
-        return this;
+    public boolean isActive() {
+        return sensor != null && mode != null && mode.isActive();
     }
 
-    public boolean isInitialized() {
-        return sensor != null;
-    }
-
-    public void awaitInitialization() {
-        if (initialized != null) {
+    public void awaitActivation() {
+        if (active != null) {
             try {
-                initialized.await();
+                active.await();
             } catch (InterruptedException e) {
             }
         }
@@ -49,18 +43,15 @@ public class ColorSensor {
             public void run() {
                 initializeSensorIfNecessary();
                 ColorSensor.this.mode.activate(sensor);
+                active.countDown();
+                active = new CountDownLatch(1);
             }
         }, "Color sensor: initialize").start();
     }
 
     private void initializeSensorIfNecessary() {
         if (sensor == null) {
-            initialized = new CountDownLatch(1);
             sensor = new EV3ColorSensor(port);
-            if (onInitializeAction != null) {
-                onInitializeAction.run();
-            }
-            initialized.countDown();
         }
     }
 
@@ -89,6 +80,8 @@ public class ColorSensor {
         void onChangeAction(Function<R, Void> onChangeAction);
 
         void desactivate();
+
+        boolean isActive();
     }
 
     private static class ColorMode implements Mode<SensorColor> {
@@ -127,6 +120,11 @@ public class ColorSensor {
         @Override
         public void desactivate() {
             active = false;
+        }
+
+        @Override
+        public boolean isActive() {
+            return active;
         }
     }
 }

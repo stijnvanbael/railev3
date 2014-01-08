@@ -13,4 +13,9 @@ public class Ev3Display implements Display {
         LCD.clear();
         LCD.refresh();
     }
+
+    @Override
+    public void clearLine(int y) {
+        LCD.clear(y);
+    }
 }
