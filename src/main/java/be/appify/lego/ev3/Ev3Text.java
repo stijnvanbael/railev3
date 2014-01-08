@@ -1,12 +1,13 @@
-package be.appify.lego.ev3.ui;
+package be.appify.lego.ev3;
 
+import be.appify.ui.Text;
 import lejos.hardware.lcd.LCD;
 
-public class Text {
+public class Ev3Text implements Text {
     private final String text;
     private boolean invert = false;
 
-    public Text(String text) {
+    public Ev3Text(String text) {
         this.text = text;
     }
 

@@ -1,8 +1,10 @@
-package be.appify.lego.ev3.component;
+package be.appify.lego.ev3;
 
+import be.appify.component.Light;
+import be.appify.component.LightColor;
 import lejos.hardware.Button;
 
-public class Light {
+public class Ev3Light implements Light {
     private LightColor color = LightColor.GREEN;
 
     public Light color(LightColor color) {
@@ -15,12 +17,12 @@ public class Light {
         return this;
     }
 
-    public Light flash() {
+    public Light blink() {
         Button.LEDPattern(color.value() + 3);
         return this;
     }
 
-    public Light blink() {
+    public Light flash() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -33,7 +35,7 @@ public class Light {
                     off();
                 }
             }
-        }, "Light: blink").start();
+        }, "Light: flash").start();
         return this;
     }
 

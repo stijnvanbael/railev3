@@ -22,6 +22,7 @@
             <groupId>lejos</groupId>
             <artifactId>lejos-ev3</artifactId>
             <version>0.5.0-alpha</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -40,6 +41,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -50,30 +52,6 @@
                             </Class-Path>
                         </manifestEntries>
                     </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>install</phase>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>sshpass</executable>
-                    <workingDirectory>target</workingDirectory>
-                    <arguments>
-                        <argument>-p</argument>
-                        <argument>""</argument>
-                        <argument>scp</argument>
-                        <argument>${project.artifactId}-${project.version}.jar</argument>
-                        <argument>root@10.0.1.1:/home/lejos/programs/</argument>
-                    </arguments>
                 </configuration>
             </plugin>
         </plugins>

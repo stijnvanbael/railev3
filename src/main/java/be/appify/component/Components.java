@@ -1,13 +1,15 @@
-package be.appify.lego.ev3.component;
+package be.appify.component;
 
+import be.appify.lego.ev3.Ev3ComponentFactory;
 import lejos.hardware.port.Port;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Components {
-    private static Display display = new Display();
-    private static Light light = new Light();
+    private static ComponentFactory componentFactory = new Ev3ComponentFactory();
+    private static Display display = componentFactory.createDisplay();
+    private static Light light = componentFactory.createLight();
     private static Map<Port, Object> hardware = new HashMap<>();
 
     public static Display display() {
@@ -15,7 +17,7 @@ public class Components {
     }
 
     public static Keypad keypad() {
-        return new Keypad();
+        return componentFactory.createKeypad();
     }
 
     public static Light light() {
@@ -38,5 +40,9 @@ public class Components {
             hardware.put(port, motor);
         }
         return motor;
+    }
+
+    public static void factory(ComponentFactory componentFactory) {
+        Components.componentFactory = componentFactory;
     }
 }

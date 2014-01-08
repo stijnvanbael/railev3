@@ -1,4 +1,4 @@
-package be.appify.lego.ev3.component;
+package be.appify.component;
 
 public enum LightColor {
     RED(2),

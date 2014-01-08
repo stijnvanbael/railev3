@@ -10,9 +10,9 @@ public class ListStream<T> implements Stream<T> {
     }
 
     @Override
-    public void apply(Function<T, Void> function) {
+    public void apply(Procedure<T> procedure) {
         for(T item : list) {
-            function.apply(item);
+            procedure.apply(item);
         }
     }
 }

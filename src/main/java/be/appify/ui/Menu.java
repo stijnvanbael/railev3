@@ -1,10 +1,11 @@
-package be.appify.lego.ev3.ui;
+package be.appify.ui;
 
-import be.appify.lego.ev3.component.Components;
-import be.appify.lego.ev3.component.Key;
-import be.appify.lego.ev3.component.LightColor;
+import be.appify.component.Components;
+import be.appify.component.Key;
+import be.appify.component.LightColor;
 import be.appify.util.Function;
 import be.appify.util.Lists;
+import be.appify.util.Procedure;
 
 import java.util.*;
 
@@ -26,7 +27,7 @@ public class Menu<T> {
     }
 
     public Menu<T> option(T option, Runnable action) {
-        options.add(new ExecutableOption<T>(option, action));
+        options.add(new ExecutableOption<>(option, action));
         return this;
     }
 
@@ -53,33 +54,25 @@ public class Menu<T> {
         return null;
     }
 
-    private T renderMenu(int x, int y) {
+    private T renderMenu(final int x, final int y) {
         if (refreshAction != null)
             refreshAction.run();
-        if (header != null) {
-            Components.display().text(header).showAt(x, y);
-            y++;
-        }
-        for (Option<T> option : options) {
-            if (option.isSelectable()) {
-                selected = option;
-                break;
-            }
-        }
+        renderHeader(x, y);
+        selectFirst();
         final Set<T> returnValue = new HashSet<>();
+        renderOptions(x, y);
         while (!exit) {
-            renderOptions(x, y);
             Components.keypad()
                     .onKeyDo(Key.UP, new Runnable() {
                         @Override
                         public void run() {
-                            selectPrevious();
+                            selectPrevious(x, y);
                         }
                     })
                     .onKeyDo(Key.DOWN, new Runnable() {
                         @Override
                         public void run() {
-                            selectNext();
+                            selectNext(x, y);
                         }
                     })
                     .onKeyDo(Key.ENTER, new Runnable() {
@@ -102,14 +95,30 @@ public class Menu<T> {
         return null;
     }
 
+    private void selectFirst() {
+        for (Option<T> option : options) {
+            if (option.isSelectable()) {
+                selected = option;
+                break;
+            }
+        }
+    }
+
+    private int renderHeader(int x, int y) {
+        if (header != null) {
+            Components.display().text(header).showAt(x, y);
+            y++;
+        }
+        return y;
+    }
+
     private void renderOptions(final int x, final int y) {
         final int[] index = new int[]{0};
         Lists.forEach(options)
-                .apply(new Function<Option<T>, Void>() {
+                .apply(new Procedure<Option<T>>() {
                     @Override
-                    public Void apply(Option<T> option) {
+                    public void apply(Option<T> option) {
                         index[0] = option.render(x, y, index[0]);
-                        return null;
                     }
                 });
     }
@@ -128,25 +137,46 @@ public class Menu<T> {
         return selected.getValue();
     }
 
-    private void selectNext() {
-        int selectedIndex = options.indexOf(selected) + 1;
-        if (selectedIndex >= options.size()) {
-            selectedIndex = 0;
-        }
-        selected = options.get(selectedIndex);
-        if (!selected.isSelectable()) {
-            selectNext();
-        }
+    private void selectNext(int x, int y) {
+        select(new Function<Integer, Integer>() {
+            @Override
+            public Integer apply(Integer previouslySelectedIndex) {
+                return previouslySelectedIndex + 1;
+            }
+        }, x, y);
     }
 
-    private void selectPrevious() {
-        int selectedIndex = options.indexOf(selected) - 1;
-        if (selectedIndex < 0) {
+    private void selectPrevious(int x, int y) {
+        select(new Function<Integer, Integer>() {
+            @Override
+            public Integer apply(Integer previouslySelectedIndex) {
+                return previouslySelectedIndex - 1;
+            }
+        }, x, y);
+    }
+
+    private void select(Function<Integer, Integer> indexOperation, int x, int y) {
+        int previouslySelectedIndex = options.indexOf(selected);
+        select(previouslySelectedIndex, indexOperation);
+        renderSelection(previouslySelectedIndex, x, y);
+    }
+
+    private void renderSelection(int previouslySelectedIndex, int x, int y) {
+        Option<T> previousSelection = options.get(previouslySelectedIndex);
+        previousSelection.render(x, y, previouslySelectedIndex);
+        selected.render(x, y, options.indexOf(selected));
+    }
+
+    private void select(int previouslySelectedIndex, Function<Integer, Integer> indexOperation) {
+        int selectedIndex = indexOperation.apply(previouslySelectedIndex);
+        if (selectedIndex >= options.size()) {
+            selectedIndex = 0;
+        } else if (selectedIndex < 0) {
             selectedIndex = options.size() - 1;
         }
         selected = options.get(selectedIndex);
         if (!selected.isSelectable()) {
-            selectPrevious();
+            select(previouslySelectedIndex, indexOperation);
         }
     }
 
