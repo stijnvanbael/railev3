@@ -1,6 +1,7 @@
 package be.appify.railev3;
 
 import be.appify.component.*;
+import be.appify.railev3.domain.Topology;
 import be.appify.ui.Menu;
 import be.appify.util.Function;
 import lejos.hardware.Sound;
@@ -12,12 +13,15 @@ import java.util.List;
 
 public class Discovery {
     private List<String> allDestinations = new ArrayList<>();
+    private Topology.Builder topologyBuilder;
 
     public Discovery(List<String> allDestinations) {
         this.allDestinations = allDestinations;
     }
 
     void initializeDiscovery() {
+        allDestinations.clear();
+        topologyBuilder = Topology.createBuilder();
         Components.display().clear();
         ColorSensor colorSensor = Components.colorSensor(SensorPort.S3);
         Components.display().text("Initializing").showAt(0, 3);
@@ -28,20 +32,33 @@ public class Discovery {
             @Override
             public Void apply(SensorColor color) {
                 if (color != SensorColor.BLACK && color != SensorColor.UNKNOWN && color != SensorColor.WHITE) {
-                    String colorName = color.name();
-                    Components.display().clearLine(7);
-                    Components.display().text("Detected: " + colorName).showAt(0, 7);
-                    Sound.twoBeeps();
-                    Components.light().color(LightColor.ORANGE).flash();
-                    if (!allDestinations.contains(colorName)) {
-                        allDestinations.add(colorName);
-                    }
+                    discovered(color);
                 }
                 return null;
             }
         });
         discoveryMenu();
         colorSensor.off();
+    }
+
+    private void discovered(SensorColor color) {
+        String colorName = color.name();
+        visualizeDiscovery(colorName);
+        registerDiscovery(colorName);
+    }
+
+    private void registerDiscovery(String colorName) {
+        if (!allDestinations.contains(colorName)) {
+            allDestinations.add(colorName);
+        }
+        topologyBuilder.add(colorName);
+    }
+
+    private void visualizeDiscovery(String colorName) {
+        Components.display().clearLine(7);
+        Components.display().text("Detected: " + colorName).showAt(0, 7);
+        Sound.twoBeeps();
+        Components.light().color(LightColor.ORANGE).flash();
     }
 
     void discoveryMenu() {
