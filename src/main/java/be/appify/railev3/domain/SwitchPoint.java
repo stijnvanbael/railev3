@@ -34,6 +34,10 @@ public class SwitchPoint extends Location {
 
     @Override
     public Location next(Rotation rotation) {
+        return next(rotation, direction);
+    }
+
+    public Location next(Rotation rotation, Direction direction) {
         return rotation == this.rotation ?
                 switched.get(direction) :
                 opposite;
@@ -45,5 +49,9 @@ public class SwitchPoint extends Location {
 
     public void throwRight() {
         direction = Direction.RIGHT;
+    }
+
+    public Rotation getRotation() {
+        return rotation;
     }
 }

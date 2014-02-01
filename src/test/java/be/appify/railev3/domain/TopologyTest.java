@@ -31,12 +31,6 @@ public class TopologyTest {
         location = location.next(Rotation.CLOCKWISE);
         assertThat(location, is(topology.at("B")));
         assertThat(location.next(Rotation.CLOCKWISE), is(nullValue()));
-
-        assertThat(topology.toString(), is(
-                "A\n" +
-                "|\n" +
-                "B\n"
-        ));
     }
 
     /*
@@ -65,22 +59,12 @@ public class TopologyTest {
 
         assertThat(c.next(Rotation.CLOCKWISE), is(a));
         assertThat(a.next(Rotation.COUNTERCLOCKWISE), is(c));
-
-        assertThat(topology.toString(), is(
-                " /A\n" +
-                "| |\n" +
-                "| B\n" +
-                "| |\n" +
-                " \\C\n"
-        ));
     }
 
 
     /*
      *    /A C
-     *   | | |
      *   | |/
-     *   | |
      *    \B
      */
     @Test
@@ -116,13 +100,9 @@ public class TopologyTest {
 
     /*
      *    /A
-     *   | |
      *   | |\
-     *   | | |
      *   | B D
-     *   | | |
      *   | |/
-     *   | |
      *    \C
      */
     @Test

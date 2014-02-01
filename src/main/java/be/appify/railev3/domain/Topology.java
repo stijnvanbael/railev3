@@ -106,45 +106,4 @@ public class Topology {
             rotation = rotation.reverse();
         }
     }
-
-    @Override
-    public String toString() {
-        if(locations.isEmpty()) {
-            return "EMPTY";
-        }
-        Location first = locations.values().iterator().next();
-        Location current = first;
-        StringBuilder builder = new StringBuilder();
-        boolean done;
-        do {
-            builder.append(current.toString()).append("\n");
-            current = current.next(Rotation.CLOCKWISE);
-            done = current == null || current == first;
-            if(!done) {
-                builder.append("|\n");
-            }
-        } while (!done);
-        String topologyAsString = builder.toString();
-        if(current == first) {
-            topologyAsString = addLoop(topologyAsString);
-        }
-        return topologyAsString;
-    }
-
-    private String addLoop(String topologyAsString) {
-        List<String> lines = Arrays.asList(topologyAsString.split("\\\n"));
-        StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < lines.size(); i++) {
-            if(i == 0) {
-                builder.append(" /");
-            } else if(i == lines.size() - 1) {
-                builder.append(" \\");
-            } else {
-                builder.append("| ");
-            }
-            builder.append(lines.get(i));
-            builder.append("\n");
-        }
-        return builder.toString();
-    }
 }
