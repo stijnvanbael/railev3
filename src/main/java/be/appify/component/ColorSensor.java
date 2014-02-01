@@ -1,6 +1,7 @@
 package be.appify.component;
 
 import be.appify.util.Function;
+import com.sun.xml.internal.bind.v2.model.runtime.RuntimeLeafInfo;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.Color;
@@ -8,9 +9,9 @@ import lejos.robotics.Color;
 import java.util.concurrent.CountDownLatch;
 
 public class ColorSensor {
-    private static final Mode COLOR = new ColorMode();
+    private static final Mode<SensorColor> COLOR = new ColorMode();
     private EV3ColorSensor sensor;
-    private Mode mode;
+    private Mode<SensorColor> mode;
     private Port port;
     private CountDownLatch active = new CountDownLatch(1);
 
@@ -32,11 +33,12 @@ public class ColorSensor {
             try {
                 active.await();
             } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    private void activateMode(Mode mode) {
+    private void activateMode(Mode<SensorColor> mode) {
         this.mode = mode;
         new Thread(new Runnable() {
             @Override

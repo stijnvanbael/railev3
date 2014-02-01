@@ -17,20 +17,22 @@ public class TopologyTest {
     @Test
     public void lineWithReverse() {
         Topology topology = Topology.createBuilder()
-                .add("A")
-                .add("B")
+                .add("A", 3)
+                .add("B", 15)
                 .reverse()
-                .add("B")
-                .add("A")
+                .add("B", 1)
+                .add("A", 16)
                 .build();
 
         Location location = topology.at("A");
         assertThat(location.getName(), is("A"));
         assertThat(location.next(Rotation.COUNTERCLOCKWISE), is(nullValue()));
+        assertThat(location.distanceToNext(Rotation.CLOCKWISE), is(15));
 
         location = location.next(Rotation.CLOCKWISE);
         assertThat(location, is(topology.at("B")));
         assertThat(location.next(Rotation.CLOCKWISE), is(nullValue()));
+        assertThat(location.distanceToNext(Rotation.COUNTERCLOCKWISE), is(15));
     }
 
     /*
@@ -43,10 +45,10 @@ public class TopologyTest {
     @Test
     public void triangle() {
         Topology topology = Topology.createBuilder()
-                .add("A")
-                .add("B")
-                .add("C")
-                .add("A")
+                .add("A", 2)
+                .add("B", 9)
+                .add("C", 7)
+                .add("A", 12)
                 .build();
 
         Location a = topology.at("A");
@@ -70,13 +72,13 @@ public class TopologyTest {
     @Test
     public void reversedSwitch() {
         Topology topology = Topology.createBuilder()
-                .add("A")
-                .add("B")
-                .add("A")
-                .add("B")
+                .add("A", 2)
+                .add("B", 12)
+                .add("A", 9)
+                .add("B", 12)
                 .reverse()
-                .add("B")
-                .add("C")
+                .add("B", 1)
+                .add("C", 9)
                 .build();
 
         Location a = topology.at("A");
@@ -95,6 +97,17 @@ public class TopologyTest {
         assertThat(switchPoint.next(Rotation.COUNTERCLOCKWISE), is(c));
 
         assertThat(b.next(Rotation.COUNTERCLOCKWISE), is(next));
+
+        assertThat(a.distanceToNext(Rotation.CLOCKWISE), is(8));
+        assertThat(switchPoint.distanceToNext(Rotation.CLOCKWISE), is(4));
+
+        switchPoint.throwLeft();
+        assertThat(switchPoint.distanceToNext(Rotation.COUNTERCLOCKWISE), is(8));
+        switchPoint.throwRight();
+        assertThat(switchPoint.distanceToNext(Rotation.COUNTERCLOCKWISE), is(5));
+
+        assertThat(b.distanceToNext(Rotation.COUNTERCLOCKWISE), is(4));
+        assertThat(c.distanceToNext(Rotation.CLOCKWISE), is(5));
     }
 
 
@@ -108,12 +121,12 @@ public class TopologyTest {
     @Test
     public void branchAndJoin() {
         Topology topology = Topology.createBuilder()
-                .add("A")
-                .add("B")
-                .add("C")
-                .add("A")
-                .add("D")
-                .add("C")
+                .add("A", 3)
+                .add("B", 8)
+                .add("C", 9)
+                .add("A", 15)
+                .add("D", 9)
+                .add("C", 10)
                 .build();
 
         Location a = topology.at("A");

@@ -9,16 +9,19 @@ public class SwitchPoint extends Location {
     private final Location opposite;
     private Direction direction;
 
-    public SwitchPoint(Rotation rotation, Location left, Location right, Location opposite) {
+    public SwitchPoint(Rotation rotation, Location left, Location right, Location opposite, int newDistance) {
         super(rotation == Rotation.CLOCKWISE ? "|\\" : "|/");
         switched = new HashMap<>();
         this.rotation = rotation;
         switched.put(Direction.LEFT, left);
         switched.put(Direction.RIGHT, right);
         this.opposite = opposite;
-        left.link(this, rotation.reverse());
-        right.link(this, rotation.reverse());
-        opposite.link(this, rotation);
+        int distanceToLeft = left.distanceToNext(rotation.reverse()) != 0 ? left.distanceToNext(rotation.reverse()) : newDistance;
+        int distanceToRight = right.distanceToNext(rotation.reverse()) != 0 ? right.distanceToNext(rotation.reverse()) : newDistance;
+        int distanceToOpposite = Math.min(distanceToLeft, distanceToRight) / 2;
+        left.link(this, rotation.reverse(), distanceToLeft - distanceToOpposite);
+        right.link(this, rotation.reverse(), distanceToRight - distanceToOpposite);
+        opposite.link(this, rotation, distanceToOpposite);
         direction = Direction.LEFT;
     }
 
@@ -27,7 +30,7 @@ public class SwitchPoint extends Location {
     }
 
     @Override
-    Location link(Location other, Rotation rotation) {
+    Location link(Location other, Rotation rotation, int distance) {
         // No more links possible
         return other;
     }
@@ -35,6 +38,10 @@ public class SwitchPoint extends Location {
     @Override
     public Location next(Rotation rotation) {
         return next(rotation, direction);
+    }
+
+    public int distanceToNext(Rotation rotation) {
+        return next(rotation).distanceToNext(rotation.reverse());
     }
 
     public Location next(Rotation rotation, Direction direction) {
@@ -49,9 +56,5 @@ public class SwitchPoint extends Location {
 
     public void throwRight() {
         direction = Direction.RIGHT;
-    }
-
-    public Rotation getRotation() {
-        return rotation;
     }
 }

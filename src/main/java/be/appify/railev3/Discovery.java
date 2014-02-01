@@ -14,6 +14,7 @@ import java.util.List;
 public class Discovery {
     private List<String> allDestinations = new ArrayList<>();
     private Topology.Builder topologyBuilder;
+    private Motor motor;
 
     public Discovery(List<String> allDestinations) {
         this.allDestinations = allDestinations;
@@ -21,6 +22,7 @@ public class Discovery {
 
     void initializeDiscovery() {
         allDestinations.clear();
+        motor = Components.motor(MotorPort.A);
         topologyBuilder = Topology.createBuilder();
         Components.display().clear();
         ColorSensor colorSensor = Components.colorSensor(SensorPort.S3);
@@ -51,7 +53,9 @@ public class Discovery {
         if (!allDestinations.contains(colorName)) {
             allDestinations.add(colorName);
         }
-        topologyBuilder.add(colorName);
+        int distance = motor.getDistance();
+        motor.resetDistance();
+        topologyBuilder.add(colorName, distance);
     }
 
     private void visualizeDiscovery(String colorName) {
@@ -62,16 +66,8 @@ public class Discovery {
     }
 
     void discoveryMenu() {
-        // /\
-        // |O  BLUE
-        // ||\
-        // |OO GREEN YELLOW
-        // ||/
-        // |O  RED
-        // \/
         Components.display().clear();
-        final Motor motor = Components.motor(MotorPort.A);
-        motor.speed(360);
+        motor.speed(60);
 
         Menu.<String>create()
                 .header("Discover topology:")
@@ -108,6 +104,7 @@ public class Discovery {
 
     void reverseEngine(Motor motor) {
         motor.reverse();
+        topologyBuilder.reverse();
     }
 
     void stopEngine(Motor motor) {

@@ -5,6 +5,8 @@ import lejos.hardware.motor.NXTRegulatedMotor;
 import lejos.hardware.port.Port;
 
 public class Motor {
+    public static final int DEGREES_PER_ROTATION = 360;
+    private static final int SECONDS_IN_A_MINUTE = 60;
     private NXTRegulatedMotor motor;
     private Port port;
     private boolean forward = true;
@@ -15,7 +17,7 @@ public class Motor {
 
     public Motor speed(int rotationsPerMinute) {
         initializeIfNecessary();
-        motor.setSpeed(rotationsPerMinute);
+        motor.setSpeed(rotationsPerMinute * DEGREES_PER_ROTATION / SECONDS_IN_A_MINUTE);
         return this;
     }
 
@@ -50,5 +52,13 @@ public class Motor {
         if (motor == null) {
             motor = new NXTRegulatedMotor(port);
         }
+    }
+
+    public int getDistance() {
+        return motor.getTachoCount() / DEGREES_PER_ROTATION;
+    }
+
+    public void resetDistance() {
+        motor.resetTachoCount();
     }
 }

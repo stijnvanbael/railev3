@@ -34,8 +34,8 @@ public class Topology {
     public static class Builder {
         List<TopologyEvent> events = new ArrayList<>();
 
-        public Builder add(String locationName) {
-            events.add(new LocationEvent(locationName));
+        public Builder add(String locationName, int distance) {
+            events.add(new LocationEvent(locationName, distance));
             return this;
         }
 
@@ -56,9 +56,11 @@ public class Topology {
 
     private static class LocationEvent implements TopologyEvent {
         private String locationName;
+        private int distance;
 
-        public LocationEvent(String locationName) {
+        public LocationEvent(String locationName, int distance) {
             this.locationName = locationName;
+            this.distance = distance;
         }
 
         @Override
@@ -67,7 +69,7 @@ public class Topology {
             if (location == null) {
                 location = new Location(locationName);
             }
-            resolution.addLocation(location);
+            resolution.addLocation(location, distance);
         }
     }
 
@@ -87,11 +89,11 @@ public class Topology {
             return locations.get(locationName);
         }
 
-        public void addLocation(Location location) {
+        public void addLocation(Location location, int distance) {
             if (location != previous) {
                 locations.put(location.getName(), location);
                 if (previous != null) {
-                    previous = previous.link(location, rotation);
+                    previous = previous.link(location, rotation, distance);
                 } else {
                     previous = location;
                 }
